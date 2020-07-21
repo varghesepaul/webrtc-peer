@@ -1,9 +1,8 @@
 // CodecsHandler.js
 
-export default class CodecsHandler {
-    sdp = null;
+const CodecsHandler = {
 
-    preferCodec = (sdp, codecName) => {
+    preferCodec(sdp, codecName) {
 
         var info = this.splitLines(sdp);
 
@@ -26,9 +25,9 @@ export default class CodecsHandler {
         sdp = this.preferCodecHelper(sdp, codecName, info);
 
         return sdp;
-    }
+    },
 
-    preferCodecHelper = (sdp, codec, info, ignore) => {
+    preferCodecHelper(sdp, codec, info, ignore) {
         var preferCodecNumber = '';
 
         if (codec === 'vp8') {
@@ -70,9 +69,9 @@ export default class CodecsHandler {
 
         sdp = sdp.replace(info.videoCodecNumbersOriginal, newLine);
         return sdp;
-    }
+    },
 
-    splitLines = (sdp) => {
+    splitLines(sdp) {
         var info = {};
         sdp.split('\n').forEach(function (line) {
             if (line.indexOf('m=video') === 0) {
@@ -99,9 +98,9 @@ export default class CodecsHandler {
         });
 
         return info;
-    }
+    },
 
-    removeVPX = (sdp) => {
+    removeVPX(sdp) {
         var info = this.splitLines(sdp);
 
         // last parameter below means: ignore these codecs
@@ -109,9 +108,9 @@ export default class CodecsHandler {
         sdp = this.preferCodecHelper(sdp, 'vp8', info, true);
 
         return sdp;
-    }
+    },
 
-    disableNACK = (sdp) => {
+    disableNACK(sdp) {
         if (!sdp || typeof sdp !== 'string') {
             return null;
         }
@@ -122,9 +121,9 @@ export default class CodecsHandler {
         sdp = sdp.replace('a=rtcp-fb:97 nack pli\r\n', 'a=rtcp-fb:97 pli\r\n');
 
         return sdp;
-    }
+    },
 
-    prioritize = (codecMimeType, peer) => {
+    prioritize(codecMimeType, peer) {
         if (!peer || !peer.getSenders || !peer.getSenders().length) {
             return;
         }
@@ -143,13 +142,13 @@ export default class CodecsHandler {
             }
             sender.setParameters(params);
         });
-    }
+    },
 
-    removeNonG722 = (sdp) => {
+    removeNonG722(sdp) {
         return sdp.replace(/m=audio ([0-9]+) RTP SAVPF ([0-9 ]*)/g, 'm=audio $1 RTP AVPF 9');
-    }
+    },
 
-    setBAS = (sdp, bandwidth, isScreen) => {
+    setBAS(sdp, bandwidth, isScreen) {
         if (!bandwidth) {
             return sdp;
         }
@@ -189,17 +188,17 @@ export default class CodecsHandler {
         }
 
         return sdp;
-    }
+    },
 
     // Find the line in sdpLines that starts with |prefix|, and, if specified,
     // contains |substr| (case-insensitive search).
-    findLine = (sdpLines, prefix, substr) => {
+    findLine(sdpLines, prefix, substr) {
         return this.findLineInRange(sdpLines, 0, -1, prefix, substr);
-    }
+    },
 
     // Find the line in sdpLines[startLine...endLine - 1] that starts with |prefix|
     // and, if specified, contains |substr| (case-insensitive search).
-    findLineInRange = (sdpLines, startLine, endLine, prefix, substr) => {
+    findLineInRange(sdpLines, startLine, endLine, prefix, substr) {
         var realEndLine = endLine !== -1 ? endLine : sdpLines.length;
         for (var i = startLine; i < realEndLine; ++i) {
             if (sdpLines[i].indexOf(prefix) === 0) {
@@ -210,16 +209,16 @@ export default class CodecsHandler {
             }
         }
         return null;
-    }
+    },
 
     // Gets the codec payload type from an a=rtpmap:X line.
-    getCodecPayloadType = (sdpLine) => {
+    getCodecPayloadType(sdpLine) {
         var pattern = new RegExp('a=rtpmap:(\\d+) \\w+\\/\\d+');
         var result = sdpLine.match(pattern);
         return (result && result.length === 2) ? result[1] : null;
-    }
+    },
 
-    setVideoBitrates = (sdp, params) => {
+    setVideoBitrates(sdp, params) {
         params = params || {};
         var xgoogle_min_bitrate = params.min;
         var xgoogle_max_bitrate = params.max;
@@ -256,9 +255,9 @@ export default class CodecsHandler {
         }
 
         return sdp;
-    }
+    },
 
-    setOpusAttributes = (sdp, params) => {
+    setOpusAttributes(sdp, params) {
         params = params || {};
 
         var sdpLines = sdp.split('\r\n');
@@ -311,11 +310,11 @@ export default class CodecsHandler {
 
         sdp = sdpLines.join('\r\n');
         return sdp;
-    }
+    },
 
     // forceStereoAudio => via webrtcexample.com
     // requires getUserMedia => echoCancellation:false
-    forceStereoAudio = (sdp) => {
+    forceStereoAudio(sdp) {
         var sdpLines = sdp.split('\r\n');
         var fmtpLineIndex = null;
         for (var i = 0; i < sdpLines.length; i++) {
@@ -337,6 +336,8 @@ export default class CodecsHandler {
         sdpLines[fmtpLineIndex] = sdpLines[fmtpLineIndex].concat('; stereo=1; sprop-stereo=1');
         sdp = sdpLines.join('\r\n');
         return sdp;
-    }
+    },
 }
+
+Object.assign(module.exports, CodecsHandler);
 

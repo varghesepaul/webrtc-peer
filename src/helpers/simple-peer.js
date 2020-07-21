@@ -11,7 +11,12 @@ export default class VideoCall {
             reconnectTimer: 1000,
             iceTransportPolicy: 'relay',
             sdpTransform: function (sdp) {
-                let prefSdp = new CodecHandler().preferCodec(sdp, 'vp9');
+                let prefSdp = CodecHandler.preferCodec(sdp, 'vp9');
+                prefSdp = CodecHandler.setOpusAttributes(prefSdp, {
+                    'useinbandfec': 1,
+                    'stereo': 1,
+                    'maxaveragebitrate': 510000
+                });
                 return prefSdp ? prefSdp : sdp
             },
             config: {
