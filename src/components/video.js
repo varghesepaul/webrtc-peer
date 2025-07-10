@@ -26,7 +26,9 @@ class Video extends React.Component {
   videoCall = new VideoCall();
 
   componentDidMount() {
-    let server = "https://peerwebrtc.livevox.ngrok.io/";
+    //let server = "https://peerwebrtc.livevox.ngrok.io/";
+    let server = "http://localhost:8080/";
+
     const socket = io(server);
     const component = this;
     this.setState({ socket });
